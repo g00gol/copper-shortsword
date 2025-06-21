@@ -1,0 +1,3 @@
+world=/home/tml/.local/share/Terraria/tModLoader/Worlds/DummyWorld.wld
+autogenerate=1
+worldname=DummyWorld

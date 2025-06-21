@@ -1,20 +1,44 @@
-FROM debian:bullseye-slim
+FROM steamcmd/steamcmd:alpine-3
 
-RUN apt-get update && apt-get install -y \
-  unzip wget curl ca-certificates libgl1-mesa-glx libxext6 \
-  libxrandr2 libxss1 libxcursor1 libxi6 libasound2 libpulse0 \
-  libxcomposite1 libxdamage1 libxtst6 libgtk-3-0 mono-complete \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install prerequisites
+RUN apk update \
+  && apk add --no-cache bash curl tmux libstdc++ libgcc icu-libs \
+  && rm -rf /var/cache/apk/*
 
-WORKDIR /tmod
+# Fix 32 and 64 bit library conflicts
+RUN mkdir /steamlib \
+  && mv /lib/libstdc++.so.6 /steamlib \
+  && mv /lib/libgcc_s.so.1 /steamlib
+ENV LD_LIBRARY_PATH /steamlib
 
-RUN wget https://github.com/tModLoader/tModLoader/releases/download/v2025.04.3.0/tModLoader.zip \
-  && unzip tModLoader.zip -d . \
-  && rm tModLoader.zip
+# Set a specific tModLoader version, defaults to the latest Github release
+ARG TML_VERSION
 
-COPY enabled.json /tmod/ModLoader/enabled.json
+# Create tModLoader user and drop root permissions
+ARG UID
+ARG GID
+RUN addgroup -g $GID tml \
+  && adduser tml -u $UID -G tml -h /home/tml -D
 
-COPY install_mod.sh /tmod/install_mod.sh
-RUN chmod +x install_mod.sh && ./install_mod.sh
+USER tml
+ENV USER tml
+ENV HOME /home/tml
+WORKDIR $HOME
 
-CMD ["./tModLoaderServer", "-nogui"]
+# Update SteamCMD and verify latest version
+RUN steamcmd +quit
+
+ADD --chown=tml:tml https://raw.githubusercontent.com/tModLoader/tModLoader/1.4.4/patches/tModLoader/Terraria/release_extras/DedicatedServerUtils/manage-tModLoaderServer.sh .
+
+# If you need to make local edits to the management script copy it to the same
+# directory as this file, comment out the above line and uncomment this line:
+# COPY --chown=tml:tml manage-tModLoaderServer.sh .
+
+# Make management script executable. Fixes "Permission Denied" error on some systems.
+RUN chmod +x manage-tModLoaderServer.sh
+
+RUN ./manage-tModLoaderServer.sh install-tml --github --tml-version $TML_VERSION
+
+EXPOSE 7777
+
+ENTRYPOINT [ "./manage-tModLoaderServer.sh", "docker", "--folder", "/home/tml/.local/share/Terraria/tModLoader" ]

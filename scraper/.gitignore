@@ -1,3 +1,5 @@
-Mods/
-ItemDump/
-*.tmod
+# Ignore all files except Worlds and Mods directories
+tModLoader/*
+!tModLoader/Worlds/DummyWorld.wld
+!tModLoader/Mods
+!tModLoader/serverconfig.txt

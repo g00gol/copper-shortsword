@@ -33,7 +33,7 @@ namespace ItemScraper.Services
     {
       if (itemType != "weapon") return null;
       if (item.shoot > 0 && item.useAmmo == AmmoID.Bullet) return "gun";
-      if (item.shoot > 0 && item.magic) return "magic gun";
+      if (item.shoot > 0 && item.CountsAsClass(DamageClass.Magic)) return "magic gun";
       if (item.channel && item.noMelee && item.noUseGraphic && item.useStyle == ItemUseStyleID.Shoot) return "yoyo";
       if (item.whip) return "whip";
       if (item.Name.ToLower().Contains("aesthetic")) return "aesthetic";
