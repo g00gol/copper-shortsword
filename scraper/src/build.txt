@@ -1,0 +1,6 @@
+displayName = Item Data Exporter
+author = jackey
+version = 0.1
+homepage = 
+description = Exports all loaded item data from Terraria and mods to JSON files for external use.
+side = Both
