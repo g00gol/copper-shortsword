@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Import tModLoader mod properties -->
+	<Import Project="..\tModLoader.targets" />
+
+	<!-- General -->
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<!-- References -->
+	<ItemGroup>
+		<PackageReference Include="tModLoader.CodeAssist" Version="*" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+
+</Project>

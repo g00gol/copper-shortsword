@@ -11,11 +11,13 @@ namespace ItemDataExporter.Services
   public class ObtainMethodService
   {
     private readonly RecipeService _recipeService;
+    private readonly TreasureBagService _treasureBagService;
     private Dictionary<int, List<int>> _npcLootCache;
 
     public ObtainMethodService(RecipeService recipeService)
     {
       _recipeService = recipeService;
+      _treasureBagService = new TreasureBagService();
       _npcLootCache = new Dictionary<int, List<int>>();
       BuildNpcLootCache();
     }
@@ -26,6 +28,9 @@ namespace ItemDataExporter.Services
       // Has recipes - it's crafted
       if (recipes.Count > 0) return "crafting";
 
+      // Check if it comes from a treasure bag
+      if (_treasureBagService.IsFromTreasureBag(item.type, out _)) return "treasure_bag";
+
       // Check if it's likely a mob drop
       if (IsMobDrop(item)) return "mob_drop";
 
@@ -35,6 +40,12 @@ namespace ItemDataExporter.Services
 
     public int GetMobDropId(Item item)
     {
+      // First check if it comes from a treasure bag
+      if (_treasureBagService.IsFromTreasureBag(item.type, out int treasureBagId))
+      {
+        return treasureBagId;
+      }
+
       // Check if any NPC drops this item and return the first one found
       foreach (var kvp in _npcLootCache)
       {

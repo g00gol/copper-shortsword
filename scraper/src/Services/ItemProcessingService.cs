@@ -87,10 +87,9 @@ namespace ItemDataExporter.Services
         Mod = modName
       };
     }
-
     private int GetObtainId(Item item, string obtainMethod)
     {
-      if (obtainMethod == "mob_drop")
+      if (obtainMethod == "mob_drop" || obtainMethod == "treasure_bag")
       {
         return _obtainMethodService.GetMobDropId(item);
       }
